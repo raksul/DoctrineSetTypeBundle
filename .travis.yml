@@ -4,8 +4,21 @@ php:
   - 5.5
   - 5.6
 
-before_script:
-  - composer install --dev
+matrix:
+  fast_finish: true
+  include:
+    - php: 5.5
+      env: COMPOSER_FLAGS='--prefer-lowest --prefer-stable'
+    - php: 5.6
+      env: SYMFONY_VERSION=2.5.*
+    - php: 5.6
+      env: SYMFONY_VERSION=2.6.*
+
+before_install:
+  - composer selfupdate
+  - if [ "$SYMFONY_VERSION" != "" ]; then composer require "symfony/symfony:${SYMFONY_VERSION}" --no-update; fi;
+
+install: composer update --prefer-dist --no-interaction $COMPOSER_FLAGS
 
 script:
   - phpunit --coverage-clover=coverage.clover
