@@ -2,10 +2,13 @@
 
 namespace Raksul\DoctrineSetTypeBundle\Tests\DBAL\Types;
 
-use Phake;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Type;
+use Phake;
+use PHPUnit\Framework\TestCase;
 use Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType;
+use Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\UserGroupType;
 
 /**
  * AbstractSetTypeTest
@@ -14,7 +17,7 @@ use Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType;
  *
  * @coversDefaultClass \Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType
  */
-class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
+class AbstractSetTypeTest extends TestCase
 {
     /**
      * @var AbstractSetType $type AbstractSetType
@@ -23,7 +26,7 @@ class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
 
     public static function setUpBeforeClass()
     {
-        Type::addType('UserGroupType', '\Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\UserGroupType');
+        Type::addType('UserGroupType', UserGroupType::class);
     }
 
     public function setUp()
@@ -69,18 +72,18 @@ class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
 
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testThrowsExceptionConvertToDatabaseValueInCaseInvalidValue()
+    public function testThrowsExceptionConvertToDatabaseValueInCaseInvalidValue(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
         $this->type->convertToDatabaseValue(['InvalidValue'], new MySqlPlatform());
     }
 
     /**
      * @dataProvider convertToPHPValueProvider
+     * @param mixed $value
+     * @param array $expected
      */
-    public function testConvertToPHPValue($value, $expected)
+    public function testConvertToPHPValue($value, array $expected): void
     {
         $this->assertEquals($expected, $this->type->convertToPHPValue($value, new MySqlPlatform()));
     }
@@ -88,7 +91,7 @@ class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
     /**
      * Data provider for method convertToPHPValue
      */
-    public function convertToPHPValueProvider()
+    public function convertToPHPValueProvider(): array
     {
         return [
             [
@@ -110,7 +113,7 @@ class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testGetSqlDeclaration()
+    public function testGetSqlDeclaration(): void
     {
         $fieldDeclaration = ['name' => 'groups'];
         $platform  = new MySqlPlatform();
@@ -119,22 +122,22 @@ class AbstractSetTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $this->type->getSqlDeclaration($fieldDeclaration, $platform));
     }
 
-    public function testGetSqlDeclarationIfNotMySqlPlatform()
+    public function testGetSqlDeclarationIfNotMySqlPlatform(): void
     {
         $fieldDeclaration = ['name' => 'groups'];
-        $platform = Phake::mock('Doctrine\DBAL\Platforms\AbstractPlatform');
+        $platform = Phake::mock(AbstractPlatform::class);
         Phake::when($platform)->getClobTypeDeclarationSQL($fieldDeclaration)->thenReturn('CLOB');
 
         $this->assertEquals('CLOB', $this->type->getSqlDeclaration($fieldDeclaration, $platform));
     }
 
-    public function testRequiresSQLCommentHint()
+    public function testRequiresSQLCommentHint(): void
     {
-        $platform = Phake::mock('Doctrine\DBAL\Platforms\AbstractPlatform');
+        $platform = Phake::mock(AbstractPlatform::class);
         $this->assertTrue($this->type->requiresSQLCommentHint($platform));
     }
 
-    public function testGetName()
+    public function testGetName(): void
     {
         $this->assertEquals('UserGroupType', $this->type->getName());
     }

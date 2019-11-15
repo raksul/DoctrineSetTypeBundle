@@ -6,9 +6,9 @@ use Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType;
 
 class UserGroupType extends AbstractSetType
 {
-    const GROUP1 = 'group1';
-    const GROUP2 = 'group2';
-    const GROUP3 = 'group3';
+    public const GROUP1 = 'group1';
+    public const GROUP2 = 'group2';
+    public const GROUP3 = 'group3';
 
     /**
      * {@inheritdoc}

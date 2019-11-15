@@ -2,32 +2,44 @@
 
 namespace Raksul\DoctrineSetTypeBundle\Tests\DBAL\Types;
 
-use Raksul\DoctrineSetTypeBundle\Form\Guess\SetTypeGuesser;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Phake;
+use PHPUnit\Framework\TestCase;
+use Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType;
+use Raksul\DoctrineSetTypeBundle\Form\Guess\SetTypeGuesser;
+use Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\InvalidType;
+use Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\UserGroupType;
+use Symfony\Component\Form\Guess\TypeGuess;
 
 /**
  * SetTypeGueserTest
  *
  * @author Yuichi Okada <y.okada@raksul.com>
  */
-class SetTypeGuesserTest extends \PHPUnit_Framework_TestCase
+class SetTypeGuesserTest extends TestCase
 {
+    /**
+     * @var \Phake_IMock
+     */
+    private $guesser;
+
     public function setUp()
     {
-        $managerRegistory = Phake::mock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registeredTypes = ['UserGroupType' => ['class' => 'Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\UserGroupType']];
+        $managerRegistry = Phake::mock(ManagerRegistry::class);
+        $registeredTypes = ['UserGroupType' => ['class' => UserGroupType::class]];
         /*
-         * @var Raksul\DoctrineSetTypeBundle\Form\Guess\SetTypeGuesser
+         * @var SetTypeGuesser
          */
         $this->guesser = Phake::partialMock(
-            'Raksul\DoctrineSetTypeBundle\Form\Guess\SetTypeGuesser',
-            $managerRegistory,
+            SetTypeGuesser::class,
+            $managerRegistry,
             $registeredTypes,
-            'Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType'
+            AbstractSetType::class
         );
     }
 
-    public function testNotGuessType()
+    public function testNotGuessType(): void
     {
         $class = 'Raksul\SomeEntity';
         $property = 'groups';
@@ -36,49 +48,49 @@ class SetTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->guesser->guessType($class, $property));
     }
 
-    public function testNotRegisteredType()
+    public function testNotRegisteredType(): void
     {
         $class = 'Raksul\SomeEntity';
         $property = 'string_field';
 
-        $classMetadata = Phake::mock('Doctrine\ORM\Mapping\ClassMetadata');
+        $classMetadata = Phake::mock(ClassMetadata::class);
         Phake::when($classMetadata)->getTypeOfField($property)->thenReturn('string');
 
         Phake::when($this->guesser)->getMetadata($class)->thenReturn([$classMetadata, 'default']);
         $this->assertNull($this->guesser->guessType($class, $property));
     }
 
-    public function testThrowsException()
+    public function testThrowsException(): void
     {
-        $managerRegistory = Phake::mock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registeredTypes = ['InvalidType' => ['class' => 'Raksul\DoctrineSetTypeBundle\Tests\Fixtures\DBAL\Types\InvalidType']];
+        $managerRegistry = Phake::mock(ManagerRegistry::class);
+        $registeredTypes = ['InvalidType' => ['class' => InvalidType::class]];
 
         $guesser = Phake::partialMock(
-            'Raksul\DoctrineSetTypeBundle\Form\Guess\SetTypeGuesser',
-            $managerRegistory,
+            SetTypeGuesser::class,
+            $managerRegistry,
             $registeredTypes,
-            'Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType'
+            AbstractSetType::class
         );
 
         $class = 'Raksul\SomeEntity';
         $property = 'groups';
 
-        $classMetadata = Phake::mock('Doctrine\ORM\Mapping\ClassMetadata');
+        $classMetadata = Phake::mock(ClassMetadata::class);
         Phake::when($classMetadata)->getTypeOfField($property)->thenReturn('InvalidType');
 
         Phake::when($guesser)->getMetadata($class)->thenReturn([$classMetadata, 'default']);
         $this->assertNull($guesser->guessType($class, $property));
     }
 
-    public function testGessingSetType()
+    public function testGessingSetType(): void
     {
         $class = 'Raksul\SomeEntity';
         $property = 'groups';
 
-        $classMetadata = Phake::mock('Doctrine\ORM\Mapping\ClassMetadata');
+        $classMetadata = Phake::mock(ClassMetadata::class);
         Phake::when($classMetadata)->getTypeOfField($property)->thenReturn('UserGroupType');
 
         Phake::when($this->guesser)->getMetadata($class)->thenReturn([$classMetadata, 'default']);
-        $this->assertInstanceOf('Symfony\Component\Form\Guess\TypeGuess', $this->guesser->guessType($class, $property));
+        $this->assertInstanceOf(TypeGuess::class, $this->guesser->guessType($class, $property));
     }
 }
