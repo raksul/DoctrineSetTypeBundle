@@ -3,11 +3,13 @@
 namespace Raksul\DoctrineSetTypeBundle\Form\Guess;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 use Symfony\Bridge\Doctrine\Form\DoctrineOrmTypeGuesser;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Guess\Guess;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Raksul\DoctrineSetTypeBundle\DBAL\Types\AbstractSetType;
-use Raksul\DoctrineSetTypeBundle\Exception\InvalidClassSpecifiedException;
+use Symfony\Component\HttpKernel\Kernel;
 
 /**
  * SetTypeGuesser
@@ -53,34 +55,39 @@ class SetTypeGuesser extends DoctrineOrmTypeGuesser
     {
         $classMetadata = $this->getMetadata($class);
         if (!$classMetadata) {
-            return;
+            return null;
         }
 
         /**
-         * @var \Doctrine\ORM\Mapping\ClassMetadata $metadata
+         * @var ClassMetadata $metadata
          * @var string $name
          */
         list($metadata) = $classMetadata;
         $fieldType = $metadata->getTypeOfField($property);
 
         if (!isset($this->registeredTypes[$fieldType])) {
-            return;
+            return null;
         }
 
         $fullClassName = $this->registeredTypes[$fieldType];
 
         if (!is_subclass_of($fullClassName, $this->parentSetTypeClass)) {
-            throw new InvalidClassSpecifiedException(sprintf('The class "%s" is wrong. You must specify class which inherit "%s".', $fullClassName, AbstractSetType::class));
+            return null;
         }
 
         // render checkboxes
         $parameters = [
-            'choices'  => $fullClassName::getChoices(),
+            'choices'  => array_flip($fullClassName::getChoices()),
             'expanded' => true,
             'multiple' => true,
             'required' => !$metadata->isNullable($property),
         ];
 
-        return new TypeGuess('choice', $parameters, Guess::VERY_HIGH_CONFIDENCE);
+        if (Kernel::MAJOR_VERSION === 2) {
+            $parameters['choices'] = $fullClassName::getChoices();
+            return new TypeGuess('choice', $parameters, Guess::VERY_HIGH_CONFIDENCE);
+        }
+
+        return new TypeGuess(ChoiceType::class, $parameters, Guess::VERY_HIGH_CONFIDENCE);
     }
 }

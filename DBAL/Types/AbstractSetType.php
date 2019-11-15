@@ -3,6 +3,7 @@
 namespace Raksul\DoctrineSetTypeBundle\DBAL\Types;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -34,7 +35,7 @@ abstract class AbstractSetType extends Type
             return null;
         }
 
-        $diff = array_diff($value, $this->getValues());
+        $diff = array_diff($value, self::getValues());
         if (count($diff) > 0) {
             throw new \InvalidArgumentException(sprintf(
                     'Invalid value "%s". It is not defined in "%s::$choices"',
@@ -74,9 +75,13 @@ abstract class AbstractSetType extends Type
         $values = implode(', ', array_map(function ($value) {
                     return "'{$value}'";
                 },
-                $this->getValues()
+                self::getValues()
             )
         );
+
+        if (!$platform instanceof MySqlPlatform) {
+            return $platform->getClobTypeDeclarationSQL($fieldDeclaration);
+        }
 
         return sprintf('SET(%s)', $values);
     }
