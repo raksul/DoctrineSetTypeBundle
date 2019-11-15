@@ -62,7 +62,7 @@ class SetTypeGuesser extends DoctrineOrmTypeGuesser
          * @var ClassMetadata $metadata
          * @var string $name
          */
-        list($metadata) = $classMetadata;
+        [$metadata] = $classMetadata;
         $fieldType = $metadata->getTypeOfField($property);
 
         if (!isset($this->registeredTypes[$fieldType])) {

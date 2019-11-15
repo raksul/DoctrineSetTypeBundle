@@ -18,7 +18,7 @@ The `DoctrineSetTypeBundle` provides support MySQL SET type for Doctrine2 in you
 
 ## Requirements
 
-* PHP ~5.5
+* PHP ~7.2
 * Symfony ~2.8 or ~3.0
 * Doctrine ~2.3
 
