@@ -17,11 +17,15 @@
         "doctrine/orm": "~2.3"
     },
     "require-dev": {
-        "phake/phake": "^2.0"
+        "phake/phake": "^3.0",
+        "phpunit/phpunit": "^7.0"
     },
     "autoload": {
         "psr-4": {
             "Raksul\\DoctrineSetTypeBundle\\": ""
         }
+    },
+    "config": {
+        "sort-packages": true
     }
 }
