@@ -56,9 +56,8 @@ jobs:
           restore-keys: "php-${{ matrix.php-version }}-symfony-${{ matrix.symfony-require }}-composer-locked-"
 
       - name: "Install dependencies with composer"
-        env:
-          SYMFONY_REQUIRE: "${{ matrix.symfony-require }}"
-        run: "composer update --no-interaction --no-progress ${{ matrix.composer-flags }}"
+        run: "composer update --with=symfony/symfony:${{ matrix.symfony-require }} --no-interaction --no-progress ${{ matrix.composer-flags }}"
+
 
       - name: "Run PHPUnit"
         if: "${{ matrix.coverage != '' }}"
