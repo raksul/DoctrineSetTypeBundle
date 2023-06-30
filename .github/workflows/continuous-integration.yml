@@ -18,10 +18,12 @@ jobs:
           - php-version: 7.4
             composer-flags: "--prefer-stable"
             symfony-require: "3.4.*"
-          - php-version: 7.4
-            composer-flags: "--prefer-stable"
-            symfony-require: "4.4.*"
-            coverage: yes
+          # When adding support for Symfony 4, restore these comments
+          # - php-version: 7.4
+          #   composer-flags: "--prefer-stable"
+          #   symfony-require: "4.4.*"
+          #   coverage: yes
+          # When adding support PHP8.0, restore these comments
           # - php-version: 8.0
           #   composer-flags: "--prefer-stable"
           #   symfony-require: "4.4.*"
