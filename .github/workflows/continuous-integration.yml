@@ -18,7 +18,7 @@ jobs:
           - php-version: 7.4
             composer-flags: "--prefer-stable"
             symfony-require: "3.4.*"
-          # When adding support for Symfony 4, restore these comments
+          # When adding support for Symfony4, restore these comments
           # - php-version: 7.4
           #   composer-flags: "--prefer-stable"
           #   symfony-require: "4.4.*"
@@ -52,8 +52,8 @@ jobs:
         uses: "actions/cache@v2"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-locked-${{ hashFiles('composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-locked-"
+          key: "php-${{ matrix.php-version }}-symfony-${{ matrix.symfony-require }}-composer-locked-${{ hashFiles('composer.lock') }}"
+          restore-keys: "php-${{ matrix.php-version }}-symfony-${{ matrix.symfony-require }}-composer-locked-"
 
       - name: "Install dependencies with composer"
         env:
