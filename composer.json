@@ -12,9 +12,9 @@
         }
     ],
     "require": {
-        "php": "^7.2",
-        "symfony/symfony": "~2.8|~3.0",
-        "doctrine/orm": "~2.3"
+        "php": "^7.4|^8.0",
+        "symfony/symfony": "^2.8|^3.0|^4.0",
+        "doctrine/orm": "^2.3"
     },
     "require-dev": {
         "phake/phake": "^3.0",
