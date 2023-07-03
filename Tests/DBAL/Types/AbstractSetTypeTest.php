@@ -24,12 +24,12 @@ class AbstractSetTypeTest extends TestCase
      */
     private $type;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         Type::addType('UserGroupType', UserGroupType::class);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->type = Type::getType('UserGroupType');
     }
